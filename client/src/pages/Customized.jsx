@@ -18,7 +18,8 @@ import {
 const Customized = () => {
   const snap = useSnapshot(state);
 
-  const [file, setFile] = useState(""); ///////// side tab
+  const [file, setFile] = useState("");
+
   const [prompt, setPrompt] = useState("");
   const [generatingImg, setGeneratingImg] = useState(false);
 
@@ -100,14 +101,10 @@ const Customized = () => {
         break;
     }
 
-    // after setting the state, activeFilterTab is updated
-
-    setActiveFilterTab((prevState) => {
-      return {
-        ...prevState,
-        [tabName]: !prevState[tabName],
-      };
-    });
+    setActiveFilterTab((prevState) => ({
+      ...prevState,
+      [tabName]: !prevState[tabName],
+    }));
   };
 
   const readFile = (type) => {
@@ -115,6 +112,10 @@ const Customized = () => {
       handleDecals(type, result);
       setActiveEditorTab("");
     });
+  };
+
+  const handleDownload = () => {
+    downloadCanvasToImage();
   };
 
   return (
@@ -141,6 +142,7 @@ const Customized = () => {
             </div>
           </motion.div>
 
+          {/* Go Back Button */}
           <motion.div
             className="absolute z-10 top-5 right-5"
             {...fadeAnimation}
@@ -150,6 +152,28 @@ const Customized = () => {
               title="Go Back"
               handleClick={() => (state.intro = true)}
               customStyles="w-fit px-4 py-2.5 font-bold text-sm"
+            />
+          </motion.div>
+
+          {/* Download Button with Icon */}
+          <motion.div
+            className="absolute top-5 left-1/2 transform -translate-x-1/2 z-10"
+            {...fadeAnimation}
+          >
+            <CustomButton
+              type="filled"
+              title={
+                <>
+                  <img
+                    src={download}
+                    alt="download-icon"
+                    className="w-6 h-6 mr-2 inline"
+                  />
+                  Download
+                </>
+              }
+              handleClick={handleDownload}
+              customStyles="w-fit px-4 py-2.5 font-bold text-sm flex items-center"
             />
           </motion.div>
 

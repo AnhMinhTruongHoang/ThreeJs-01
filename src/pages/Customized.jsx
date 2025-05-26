@@ -18,8 +18,7 @@ import {
 const Customized = () => {
   const snap = useSnapshot(state);
 
-  const [file, setFile] = useState("");
-
+  const [file, setFile] = useState(""); ///////// side tab
   const [prompt, setPrompt] = useState("");
   const [generatingImg, setGeneratingImg] = useState(false);
 

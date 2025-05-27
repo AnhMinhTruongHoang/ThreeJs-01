@@ -1,21 +1,27 @@
-import React from "react";
+import { useRef } from "react";
 import { easing } from "maath";
 import { useSnapshot } from "valtio";
 import { useFrame } from "@react-three/fiber";
 import { Decal, useGLTF, useTexture } from "@react-three/drei";
-
 import state from "../store";
 
-const Shirt = () => {
+const Shirt2 = () => {
   const snap = useSnapshot(state);
-  const { nodes, materials } = useGLTF("/shirt_baked.glb");
+  const { nodes, materials } = useGLTF("/shirt_2.glb");
 
   const logoTexture = useTexture(snap.logoDecal);
   const fullTexture = useTexture(snap.fullDecal);
 
-  useFrame((state, delta) =>
-    easing.dampC(materials.lambert1.color, snap.color, 0.25, delta)
-  );
+  // Select appropriate material
+  const shirtMaterial =
+    materials?.Shirt00_1Material4782 || materials?.Shirt00_1Button_FRONT;
+
+  // Animate color if no texture is present
+  useFrame((state, delta) => {
+    if (shirtMaterial && !shirtMaterial.map) {
+      easing.dampC(shirtMaterial.color, snap.color, 0.25, delta);
+    }
+  });
 
   const stateString = JSON.stringify(snap);
 
@@ -23,24 +29,26 @@ const Shirt = () => {
     <group key={stateString}>
       <mesh
         castShadow
-        geometry={nodes.T_Shirt_male.geometry}
-        material={materials.lambert1}
+        geometry={nodes?.Object_7?.geometry}
+        material={shirtMaterial}
         material-roughness={1}
         dispose={null}
       >
-        {snap.isFullTexture && (
+        {/* Full shirt texture */}
+        {snap.isFullTexture && fullTexture && (
           <Decal
             position={[0, 0, 0]}
-            rotation={[0, 0, 0]}
+            rotation={[0, 0, 0]} // Adjust if needed
             scale={1}
             map={fullTexture}
           />
         )}
 
-        {snap.isLogoTexture && (
+        {/* Logo decal */}
+        {snap.isLogoTexture && logoTexture && (
           <Decal
-            position={[0, 0.04, 0.15]}
-            rotation={[0, 0, 0]}
+            position={[0, 0.1, 0.15]} // Adjust if needed
+            rotation={[Math.PI, 0, 0]} // Change to [Math.PI, 0, 0] or [0, Math.PI, 0] if flipped
             scale={0.15}
             map={logoTexture}
             anisotropy={16}
@@ -53,4 +61,4 @@ const Shirt = () => {
   );
 };
 
-export default Shirt;
+export default Shirt2;

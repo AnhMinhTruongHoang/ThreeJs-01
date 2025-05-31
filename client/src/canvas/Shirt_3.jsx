@@ -1,6 +1,5 @@
-import { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useSnapshot } from "valtio";
-import { useFrame } from "@react-three/fiber";
 import { useGLTF, useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import state from "../store";
@@ -8,39 +7,41 @@ import state from "../store";
 const Shirt3 = () => {
   const snap = useSnapshot(state);
   const { nodes, materials } = useGLTF("/womens_shirt.glb");
+  console.log("Nodes:", nodes);
+  console.log("Materials:", materials);
 
-  const logoTexture = useTexture(snap.logoDecal);
   const fullTexture = useTexture(snap.fullDecal);
-  fullTexture.encoding = THREE.sRGBEncoding;
-
-  const meshKeys = Object.keys(nodes).filter((key) =>
-    key.startsWith("Object_")
-  );
+  const shirtRef = useRef();
 
   useEffect(() => {
-    meshKeys.forEach((key) => {
-      const mesh = nodes[key];
-      if (mesh?.material && fullTexture) {
-        mesh.material.map = fullTexture;
-        mesh.material.color.set(0xffffff); // Keep original tone
-        mesh.material.needsUpdate = true;
-      }
+    if (!fullTexture || !shirtRef.current) return;
+
+    // 🔧 Critical texture fix
+    fullTexture.encoding = THREE.sRGBEncoding;
+    fullTexture.colorSpace = THREE.SRGBColorSpace;
+    fullTexture.flipY = false;
+
+    // 🧪 Create a new material with the texture
+    const newMaterial = new THREE.MeshStandardMaterial({
+      map: fullTexture,
+      color: new THREE.Color(0xffffff),
+      roughness: 1,
+      metalness: 0,
     });
+
+    shirtRef.current.material = newMaterial;
   }, [fullTexture]);
 
   return (
     <group dispose={null}>
-      {meshKeys.map((key) => {
-        const mesh = nodes[key];
-        return (
-          <mesh
-            key={key}
-            geometry={mesh.geometry}
-            material={mesh.material}
-            rotation={[-Math.PI / 2, 0, 0]}
-          />
-        );
-      })}
+      <mesh
+        ref={shirtRef}
+        geometry={nodes.geometry}
+        material={nodes.material}
+        castShadow
+        receiveShadow
+        rotation={[-Math.PI / 2, 0, 0]} // adjust only if needed
+      />
     </group>
   );
 };

@@ -30,7 +30,7 @@ const Shirt3 = () => {
   return (
     <group
       dispose={null}
-      rotation={[0, Math.PI, 0]} // <- FIXED: Face toward camera
+      rotation={[0, 0, 0]}
       scale={[0.012, 0.012, 0.012]} // <- FIXED: Scale appropriately
       position={[0, -0.8, 0]} // <- FIXED: Lower model into frame
     >

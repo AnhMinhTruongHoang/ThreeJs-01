@@ -1,47 +1,52 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import { useSnapshot } from "valtio";
+import { useFrame } from "@react-three/fiber";
 import { useGLTF, useTexture } from "@react-three/drei";
 import * as THREE from "three";
+import { easing } from "maath";
 import state from "../store";
 
 const Shirt3 = () => {
   const snap = useSnapshot(state);
   const { nodes, materials } = useGLTF("/womens_shirt.glb");
-  console.log("Nodes:", nodes);
-  console.log("Materials:", materials);
-
   const fullTexture = useTexture(snap.fullDecal);
-  const shirtRef = useRef();
+
+  useFrame((_, delta) => {
+    Object.values(materials).forEach((material) => {
+      if (material?.color) {
+        easing.dampC(material.color, snap.color, 0.25, delta);
+      }
+    });
+  });
 
   useEffect(() => {
-    if (!fullTexture || !shirtRef.current) return;
-
-    // 🔧 Critical texture fix
-    fullTexture.encoding = THREE.sRGBEncoding;
-    fullTexture.colorSpace = THREE.SRGBColorSpace;
-    fullTexture.flipY = false;
-
-    // 🧪 Create a new material with the texture
-    const newMaterial = new THREE.MeshStandardMaterial({
-      map: fullTexture,
-      color: new THREE.Color(0xffffff),
-      roughness: 1,
-      metalness: 0,
+    if (!fullTexture) return;
+    Object.values(materials).forEach((material) => {
+      material.map = fullTexture;
+      material.needsUpdate = true;
     });
-
-    shirtRef.current.material = newMaterial;
-  }, [fullTexture]);
+  }, [fullTexture, materials]);
 
   return (
-    <group dispose={null}>
-      <mesh
-        ref={shirtRef}
-        geometry={nodes.geometry}
-        material={nodes.material}
-        castShadow
-        receiveShadow
-        rotation={[-Math.PI / 2, 0, 0]} // adjust only if needed
-      />
+    <group
+      dispose={null}
+      rotation={[0, Math.PI, 0]} // <- FIXED: Face toward camera
+      scale={[0.012, 0.012, 0.012]} // <- FIXED: Scale appropriately
+      position={[0, -0.8, 0]} // <- FIXED: Lower model into frame
+    >
+      {Object.entries(nodes).map(([key, mesh]) => {
+        if (!mesh.isMesh) return null;
+
+        return (
+          <mesh
+            key={key}
+            geometry={mesh.geometry}
+            material={mesh.material}
+            castShadow
+            receiveShadow
+          />
+        );
+      })}
     </group>
   );
 };

@@ -1,38 +1,39 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useSnapshot } from "valtio";
 import { useFrame } from "@react-three/fiber";
 import { useGLTF, useTexture } from "@react-three/drei";
+import { easing } from "maath";
 import state from "../store";
 
 const Shirt2 = () => {
   const snap = useSnapshot(state);
   const { nodes, materials } = useGLTF("/shirt_2.glb");
-
   const fullTexture = useTexture(snap.fullDecal);
 
-  useFrame((state, delta) =>
-    easing.dampC(materials.lambert1.color, snap.color, 0.25, delta)
-  );
-
-  const meshKeys = Object.keys(nodes).filter((key) =>
-    key.startsWith("Object_")
-  );
-
-  // Assign texture to all matching materials
-  useEffect(() => {
-    meshKeys.forEach((key) => {
-      const mesh = nodes[key];
-      if (mesh?.material && fullTexture) {
-        mesh.material.map = fullTexture;
-        mesh.material.needsUpdate = true;
+  // Animate color across all materials
+  useFrame((_, delta) => {
+    Object.values(materials).forEach((material) => {
+      if (material?.color) {
+        easing.dampC(material.color, snap.color, 0.25, delta);
       }
     });
-  }, [fullTexture]);
+  });
+
+  // Apply the full texture to all materials
+  useEffect(() => {
+    if (!fullTexture) return;
+
+    Object.values(materials).forEach((material) => {
+      material.map = fullTexture;
+      material.needsUpdate = true;
+    });
+  }, [fullTexture, materials]);
 
   return (
     <group dispose={null}>
-      {meshKeys.map((key) => {
-        const mesh = nodes[key];
+      {Object.entries(nodes).map(([key, mesh]) => {
+        if (!mesh.isMesh) return null;
+
         return (
           <mesh
             key={key}

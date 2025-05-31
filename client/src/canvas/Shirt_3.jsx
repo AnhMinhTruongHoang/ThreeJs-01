@@ -21,9 +21,12 @@ const Shirt3 = () => {
 
   useEffect(() => {
     if (!fullTexture) return;
-    Object.values(materials).forEach((material) => {
-      material.map = fullTexture;
-      material.needsUpdate = true;
+    Object.entries(materials).forEach(([name, material]) => {
+      if (name === "Material.001") {
+        // Thay đúng tên material của phần cần áp texture
+        material.map = fullTexture;
+        material.needsUpdate = true;
+      }
     });
   }, [fullTexture, materials]);
 

@@ -4,7 +4,7 @@ import Shirt3 from "./Shirt_3";
 import Backdrop from "./Backdrop";
 import CameraRig from "./CameraRig";
 
-const CanvasModel = () => {
+const CanvasModel3 = () => {
   return (
     <Canvas
       shadows
@@ -35,4 +35,4 @@ const CanvasModel = () => {
   );
 };
 
-export default CanvasModel;
+export default CanvasModel3;

@@ -6,23 +6,27 @@ import CanvasModel2 from "./canvas/index2";
 import CanvasModel3 from "./canvas/index3";
 
 function App() {
-  const [activeCanvas, setActiveCanvas] = useState("canvas1"); // default canvas
+  const [activeCanvas, setActiveCanvas] = useState("canvas1");
 
   return (
     <main className="app transition-all ease-in">
       <Home />
 
-      {/* Buttons to switch canvas */}
-      <div className="button-group">
-        <button onClick={() => setActiveCanvas("canvas1")}>
-          Show Canvas 1
-        </button>
-        <button onClick={() => setActiveCanvas("canvas2")}>
-          Show Canvas 2
-        </button>
-        <button onClick={() => setActiveCanvas("canvas3")}>
-          Show Canvas 3
-        </button>
+      {/* Dropdown to switch canvas */}
+      <div className="dropdown-group mb-4">
+        <label htmlFor="canvas-select" className="mr-2">
+          Select Shirt:
+        </label>
+        <select
+          id="canvas-select"
+          value={activeCanvas}
+          onChange={(e) => setActiveCanvas(e.target.value)}
+          className="p-2 border rounded"
+        >
+          <option value="canvas1">Shirt 1</option>
+          <option value="canvas2">Shirt 2</option>
+          <option value="canvas3">Shirt 3</option>
+        </select>
       </div>
 
       {/* Conditional rendering of canvas */}

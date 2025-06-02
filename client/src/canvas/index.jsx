@@ -14,15 +14,6 @@ const CanvasModel = () => {
     >
       <ambientLight intensity={0.5} />
       <Environment preset="city" />
-      <OrbitControls
-        enableZoom={true}
-        enablePan={false}
-        enableDamping={true}
-        dampingFactor={0.1}
-        rotateSpeed={0.5}
-        maxPolarAngle={Math.PI / 2} // optional: prevent flipping
-        minPolarAngle={0}
-      />
 
       <CameraRig>
         <Backdrop />
